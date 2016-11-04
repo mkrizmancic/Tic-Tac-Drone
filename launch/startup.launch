@@ -1,0 +1,11 @@
+
+<launch>
+	<!-- Start Optitrack node -->
+	<include file="/home/marko/catkin_ws/src/vrpn_client_ros/launch/across.launch"/>
+	<!--inlude file="$HOME/catkin_ws/src/vrpn_client_ros/launch/borongaj.launch"/-->
+
+	<node type="OptitrackNode.py" pkg="tic_tac_drone" name="Optitrack">
+		<remap from="MyUAV/pose" to="vrpn_client_node/UAV1/pose"/>
+		<remap from="OpUAV/pose" to="vrpn_client_node/UAV2/pose"/>
+	</node>
+</launch>
