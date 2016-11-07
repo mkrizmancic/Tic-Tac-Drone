@@ -52,11 +52,6 @@ class OptitrackNode():
         self.uav2.pos.y = data.pose.position.z
         self.uav2.pos.z = data.pose.position.y
 
-        euler = self.quat_to_eul(data)
-        self.uav2.rot.roll = degrees(euler[0])
-        self.uav2.rot.pitch = degrees(euler[1])
-        self.uav2.rot.yaw = degrees(euler[2])
-
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher
