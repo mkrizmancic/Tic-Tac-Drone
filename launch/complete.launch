@@ -14,4 +14,8 @@
 		<remap from="MyUAV/pose" to="vrpn_client_node/UAV1/pose"/>
 		<remap from="OpUAV/pose" to="vrpn_client_node/UAV2/pose"/>
 	</node>
+
+	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller">
+		<remap from="joystick_input" to="joy"/>
+	</node>
 </launch>

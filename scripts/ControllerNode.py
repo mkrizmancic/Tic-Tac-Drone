@@ -9,6 +9,7 @@ and communicates with Arduino type microcontroller.
 #Must import rospy and msgs
 import rospy
 from sensor_msgs.msg import Joy
+from tic_tac_drone.msg import CtrlValue
 
 
 class ControllerNode():
@@ -17,18 +18,18 @@ class ControllerNode():
         if (data.GUMB_ZA_PROMJENU_MODA):
             self.mode = not self.mode
 
-        self.IME_PORUKE.pitch = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.IME_PORUKE.roll = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.IME_PORUKE.throttle = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.IME_PORUKE.yaw = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
+        self.control.pitch = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
+        self.control.roll = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
+        self.control.throttle = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
+        self.control.yaw = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
         #ili
-        self.IME_PORUKE.yaw = data.buttons[]*self.yaw_rate*(-1) + data.buttons[]*self.yaw_rate
+        self.control.yaw = data.buttons[]*self.yaw_rate*(-1) + data.buttons[]*self.yaw_rate
 
             
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher for commands
-        pub = rospy.Publisher('manual_output',TIP_PORUKE, queue_size=1)
+        pub = rospy.Publisher('manual_output',CtrlValue, queue_size=1)
 
         # Local helper variables
         self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> 40%
@@ -36,13 +37,13 @@ class ControllerNode():
         self.yaw_rate =
 
         # Set the message to publish as command.
-        self.IME_PORUKE = TIP_PORUKE()
+        self.control = CtrlValue()
         
         # Initialize message variables.
-        self.IME_PORUKE.pitch = 0
-        self.IME_PORUKE.roll = 0
-        self.IME_PORUKE.yaw = 0
-        self.IME_PORUKE.throttle = 0
+        self.control.pitch = 0
+        self.control.roll = 0
+        self.control.yaw = 0
+        self.control.throttle = 0
         
         # Create a subscriber for color msg
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
@@ -50,7 +51,7 @@ class ControllerNode():
         # Main while loop.
         while not rospy.is_shutdown():
             # Publish our command.
-            pub.publish(self.IME_PORUKE)
+            pub.publish(self.control)
             rospy.sleep(1.0)
 
 if __name__ == '__main__':
