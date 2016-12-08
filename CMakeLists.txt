@@ -50,6 +50,7 @@ add_message_files(
   Rotation.msg
   Point.msg
   CustomPose.msg
+  CtrlValue.msg
 )
 
 ## Generate services in the 'srv' folder

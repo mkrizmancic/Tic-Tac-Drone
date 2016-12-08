@@ -15,15 +15,16 @@ from tic_tac_drone.msg import CtrlValue
 class ControllerNode():
     # Callback for msgs
     def joystick_callback(self,data):
-        if (data.GUMB_ZA_PROMJENU_MODA):
+        if (data.buttons[1]):
             self.mode = not self.mode
 
-        self.control.pitch = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.control.roll = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.control.throttle = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        self.control.yaw = data.axes[] / self.max_axis_value * (1-0.6*self.mode)
-        #ili
-        self.control.yaw = data.buttons[]*self.yaw_rate*(-1) + data.buttons[]*self.yaw_rate
+        modifier = self.sensitivity if self.mode else 1
+
+        rospy.loginfo ("Mode = {0}".format(self.mode))
+        self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
+        self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
+        self.control.throttle = (data.axes[2] + 1) * 0.5 * modifier
+        self.control.yaw = data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
             
     # Must have __init__(self) function for a class
@@ -32,9 +33,9 @@ class ControllerNode():
         pub = rospy.Publisher('manual_output',CtrlValue, queue_size=1)
 
         # Local helper variables
-        self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> 40%
-        self.max_axis_value =
-        self.yaw_rate =
+        self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> definied by self.sensitivity
+        self.sensitivity = 0.4 # STAVITI OVO KAO PARAMETAR
+        self.yaw_rate = 0.5 #STAVITI OVO KAO PARAMETAR
 
         # Set the message to publish as command.
         self.control = CtrlValue()
@@ -49,10 +50,11 @@ class ControllerNode():
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
         
         # Main while loop.
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             # Publish our command.
             pub.publish(self.control)
-            rospy.sleep(1.0)
+            rate.sleep()
 
 if __name__ == '__main__':
     # Initialize the node and name it.
