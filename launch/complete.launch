@@ -4,14 +4,19 @@
 	<!--inlude file="$HOME/catkin_ws/src/vrpn_client_ros/launch/borongaj.launch"/-->
 
 	<!-- Start Joy node: user control with joystick -->
-	<node pkg="joy" type="joy_node" name="ManControl">
+	<node pkg="joy" type="joy_node" name="JoyInput">
 		<!-- REPLACE jsX WITH THE RIGHT JOYSTICK IDENTIFIER -->
-		<param name="joy_node/dev" value="/dev/input/jsX"/>
+		<param name="dev" type="string" value="/dev/input/js1" />
+		<param name="deadzone" value="0"/>
 	</node>
 
 	<!-- Start Optitrack node: calculating and distributing postion data -->
 	<node pkg="tic_tac_drone" type="OptitrackNode.py" name="Optitrack">
 		<remap from="MyUAV/pose" to="vrpn_client_node/UAV1/pose"/>
 		<remap from="OpUAV/pose" to="vrpn_client_node/UAV2/pose"/>
+	</node>
+
+	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller">
+		<remap from="joystick_input" to="joy"/>
 	</node>
 </launch>
