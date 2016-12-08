@@ -67,11 +67,12 @@ class OptitrackNode():
         rospy.Subscriber("OpUAV/pose", PoseStamped, self.adjust_axis_2)
         
         # Main while loop.
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             # Publish our command.
             pub_p1.publish(self.uav1)
             pub_p2.publish(self.uav2)
-            rospy.sleep(0.1)
+            rate.sleep()
 
 if __name__ == '__main__':
     # Initialize the node and name it.
