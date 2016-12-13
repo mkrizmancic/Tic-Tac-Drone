@@ -24,7 +24,7 @@ class ControllerNode():
         self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
         self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
         self.control.throttle = (data.axes[2] + 1) * 0.5 * modifier
-        self.control.yaw = data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
+        self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
             
     # Must have __init__(self) function for a class
@@ -35,7 +35,7 @@ class ControllerNode():
         # Local helper variables
         self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> definied by self.sensitivity
         self.sensitivity = 0.4 # STAVITI OVO KAO PARAMETAR
-        self.yaw_rate = 0.5 #STAVITI OVO KAO PARAMETAR
+        self.yaw_rate = 0.2 #STAVITI OVO KAO PARAMETAR
 
         # Set the message to publish as command.
         self.control = CtrlValue()
