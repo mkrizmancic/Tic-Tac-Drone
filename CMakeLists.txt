@@ -51,6 +51,7 @@ add_message_files(
   Point.msg
   CustomPose.msg
   CtrlValue.msg
+  MakeMove.msg
 )
 
 ## Generate services in the 'srv' folder
