@@ -27,8 +27,6 @@ class ControllerNode():
 
         rospy.loginfo ("Mode = {0}".format(self.mode))
         self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
-        pitch = int(self.control.pitch*255)
-
         self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
         self.control.throttle = (data.axes[2] + 1) * 0.5 * modifier * self.kill
         self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
