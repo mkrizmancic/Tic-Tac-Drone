@@ -18,13 +18,20 @@ class ControllerNode():
         if (data.buttons[1]):
             self.mode = not self.mode
 
+        if (data.buttons[0]):
+            self.kill = 0
+        elif (data.buttons[7] and data.buttons[8] and data.axes[2] == -1):
+            self.kill = 1
+
         modifier = self.sensitivity if self.mode else 1
 
         rospy.loginfo ("Mode = {0}".format(self.mode))
         self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
+        pitch = int(self.control.pitch*255)
+
         self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
-        self.control.throttle = (data.axes[2] + 1) * 0.5 * modifier
-        self.control.yaw = data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
+        self.control.throttle = (data.axes[2] + 1) * 0.5 * modifier * self.kill
+        self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
             
     # Must have __init__(self) function for a class
@@ -34,8 +41,9 @@ class ControllerNode():
 
         # Local helper variables
         self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> definied by self.sensitivity
-        self.sensitivity = 0.4 # STAVITI OVO KAO PARAMETAR
-        self.yaw_rate = 0.5 #STAVITI OVO KAO PARAMETAR
+        self.sensitivity = rospy.get_param('~sensitivity', 0.4)
+        self.yaw_rate = rospy.get_param('~yaw_rate', 0.2)
+        self.kill = 1 # Flag for a panic button
 
         # Set the message to publish as command.
         self.control = CtrlValue()
@@ -50,7 +58,7 @@ class ControllerNode():
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
         
         # Main while loop.
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             # Publish our command.
             pub.publish(self.control)

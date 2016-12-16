@@ -5,7 +5,7 @@
 
 	<!-- Start Joy node: user control with joystick -->
 	<node pkg="joy" type="joy_node" name="JoyInput">
-		<!-- REPLACE jsX WITH THE RIGHT JOYSTICK IDENTIFIER -->
+		<!-- REPLACE jsX WITH THE RIGHT JOYSTICK IDENTIFIERˇˇˇ-->
 		<param name="dev" type="string" value="/dev/input/js1" />
 		<param name="deadzone" value="0"/>
 	</node>
@@ -18,5 +18,12 @@
 
 	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller">
 		<remap from="joystick_input" to="joy"/>
+		<param name="sensitivity" value="0.4"/>
+		<param name="yaw_rate" value="0.2"/>
+
+	</node>
+
+	<node pkg="rosserial_python" type="serial_node.py" name="rosserial">
+		<param name="port" value="/dev/ttyUSB1"/>
 	</node>
 </launch>

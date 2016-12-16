@@ -9,7 +9,7 @@ and distributes that information to other nodes.
 
 #Import necessary dependencies
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Point
 from tic_tac_drone.msg import CustomPose
 from tf.transformations import euler_from_quaternion
 from math import degrees
@@ -52,22 +52,35 @@ class OptitrackNode():
         self.uav2.pos.y = data.pose.position.z
         self.uav2.pos.z = data.pose.position.y
 
+    def adjust_field (self, data):
+        """
+        Callback function that adjusts axis data for playing field and publishes its position.
+        """
+        self.field.pos.x = data.pose.position.x
+        self.field.pos.y = data.pose.position.z
+        self.field.pos.z = 0
+
+        self.pub_f.publish(self.field)
+
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher
         pub_p1 = rospy.Publisher('MyUAV/cpose', CustomPose, queue_size=1)
         pub_p2 = rospy.Publisher('OpUAV/cpose', CustomPose, queue_size=1)
+        self.pub_f = rospy.Publisher('field_pos', CustomPose, queue_size=1)
  
         # Set the message to publish as command.
         self.uav1 = CustomPose()    # Position of our UAV
         self.uav2 = CustomPose()    # Position of opponent UAV
+        self.field = CustomPose()   # Position of playing field
         
         # Create subscribers
         rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1)
         rospy.Subscriber("OpUAV/pose", PoseStamped, self.adjust_axis_2)
+        rospy.Subscriber("Field/pose", PoseStamped, self.adjust_field)
         
         # Main while loop.
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             # Publish our command.
             pub_p1.publish(self.uav1)
