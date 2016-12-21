@@ -56,9 +56,9 @@ class OptitrackNode():
         """
         Callback function that adjusts axis data for playing field and publishes its position.
         """
-        self.field.pos.x = data.pose.position.x
-        self.field.pos.y = data.pose.position.z
-        self.field.pos.z = 0
+        self.field.x = data.pose.position.x
+        self.field.y = data.pose.position.z
+        self.field.z = 0
 
         self.pub_f.publish(self.field)
 
@@ -67,12 +67,12 @@ class OptitrackNode():
         # Create a publisher
         pub_p1 = rospy.Publisher('MyUAV/cpose', CustomPose, queue_size=1)
         pub_p2 = rospy.Publisher('OpUAV/cpose', CustomPose, queue_size=1)
-        self.pub_f = rospy.Publisher('field_pos', CustomPose, queue_size=1)
+        self.pub_f = rospy.Publisher('field_pos', Point, queue_size=1)
  
         # Set the message to publish as command.
         self.uav1 = CustomPose()    # Position of our UAV
         self.uav2 = CustomPose()    # Position of opponent UAV
-        self.field = CustomPose()   # Position of playing field
+        self.field = Point()   # Position of playing field
         
         # Create subscribers
         rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1)

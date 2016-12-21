@@ -28,8 +28,4 @@
 		<!-- REPLACE value WITH THE RIGHT PORT NAME -->
 		<param name="port" value="/dev/ttyUSB0"/>
 	</node>
-
-	<!-- Start GUI_Game node: GUI and game algorithm -->
-	<node pkg="tic_tac_drone" type="GUI_GameNode.py" name="GUI" output="screen">
-	</node>
 </launch>

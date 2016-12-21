@@ -16,20 +16,4 @@
 		<remap from="OpUAV/pose" to="vrpn_client_node/UAV2/pose"/>
 	</node>
 
-	<!-- Start Controller node: providing inputs for controling the drone -->
-	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller">
-		<remap from="joystick_input" to="joy"/>
-		<param name="sensitivity" value="0.6"/>
-		<param name="yaw_rate" value="0.2"/>
-	</node>
-
-	<!-- Start Rosserial node: communication between ROS and microcontroller -->
-	<node pkg="rosserial_python" type="serial_node.py" name="rosserial">
-		<!-- REPLACE value WITH THE RIGHT PORT NAME -->
-		<param name="port" value="/dev/ttyUSB0"/>
-	</node>
-
-	<!-- Start GUI_Game node: GUI and game algorithm -->
-	<node pkg="tic_tac_drone" type="GUI_GameNode.py" name="GUI" output="screen">
-	</node>
 </launch>
