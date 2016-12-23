@@ -9,7 +9,7 @@ and distributes that information to other nodes.
 
 #Import necessary dependencies
 import rospy
-from geometry_msgs.msg import PoseStamped, Point
+from geometry_msgs.msg import PoseStamped, Pose2D
 from tic_tac_drone.msg import CustomPose
 from tf.transformations import euler_from_quaternion
 from math import degrees
@@ -35,7 +35,7 @@ class OptitrackNode():
         Data is stored in class variables.
         """
         self.uav1.pos.x = data.pose.position.x
-        self.uav1.pos.y = data.pose.position.z
+        self.uav1.pos.y = -data.pose.position.z
         self.uav1.pos.z = data.pose.position.y
 
         euler = self.quat_to_eul(data)
@@ -58,21 +58,22 @@ class OptitrackNode():
         """
         self.field.x = data.pose.position.x
         self.field.y = data.pose.position.z
-        self.field.z = 0
+        euler = self.quat_to_eul(data)
+        self.field.theta = degrees(euler[2])
 
-        self.pub_f.publish(self.field)
+        #self.pub_f.publish(self.field)
 
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher
         pub_p1 = rospy.Publisher('MyUAV/cpose', CustomPose, queue_size=1)
         pub_p2 = rospy.Publisher('OpUAV/cpose', CustomPose, queue_size=1)
-        self.pub_f = rospy.Publisher('field_pos', Point, queue_size=1)
+        pub_f = rospy.Publisher('field_pos', Pose2D, queue_size=1)
  
         # Set the message to publish as command.
         self.uav1 = CustomPose()    # Position of our UAV
         self.uav2 = CustomPose()    # Position of opponent UAV
-        self.field = Point()   # Position of playing field
+        self.field = Pose2D()       # Position of playing field
         
         # Create subscribers
         rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1)
@@ -85,6 +86,7 @@ class OptitrackNode():
             # Publish our command.
             pub_p1.publish(self.uav1)
             pub_p2.publish(self.uav2)
+            pub_f.publish(self.field)
             rate.sleep()
 
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ class ControllerNode():
 
         modifier = self.sensitivity if self.mode else 1
 
-        rospy.loginfo ("Mode = {0}".format(self.mode))
+        rospy.loginfo (rospy.get_caller_id() + ": Mode = {0} %".format(100 - self.mode * (1 - self.sensitivity) * 100))
         if (data.buttons[10]):
             self.control.pitch = 0
             self.control.roll = 1
@@ -47,7 +47,7 @@ class ControllerNode():
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher for commands
-        pub = rospy.Publisher('manual_output',CtrlValue, queue_size=1)
+        pub = rospy.Publisher('manual_output', CtrlValue, queue_size=1)
 
         # Local helper variables
         self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> definied by self.sensitivity
@@ -59,9 +59,9 @@ class ControllerNode():
         self.control = CtrlValue()
         
         # Initialize message variables.
-        self.control.pitch = 0
-        self.control.roll = 0
-        self.control.yaw = 0
+        self.control.pitch = 0.5
+        self.control.roll = 0.5
+        self.control.yaw = 0.5
         self.control.throttle = 0
         
         # Create a subscriber for color msg

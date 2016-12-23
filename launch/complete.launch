@@ -1,7 +1,7 @@
 <launch>
 	<!-- Start VRPN Client node: getting data from Optitrack -->
-	<include file="/home/marko/catkin_ws/src/vrpn_client_ros/launch/across.launch"/>
-	<!--inlude file="$HOME/catkin_ws/src/vrpn_client_ros/launch/borongaj.launch"/-->
+	<!-- Include  the file that contains your custom vrpn launch-->
+	<include file="/home/marko/catkin_ws/src/vrpn_client_ros/launch/borongaj.launch"/>
 
 	<!-- Start Joy node: user control with joystick -->
 	<node pkg="joy" type="joy_node" name="JoyInput">
@@ -14,10 +14,11 @@
 	<node pkg="tic_tac_drone" type="OptitrackNode.py" name="Optitrack">
 		<remap from="MyUAV/pose" to="vrpn_client_node/UAV1/pose"/>
 		<remap from="OpUAV/pose" to="vrpn_client_node/UAV2/pose"/>
+		<remap from="Field/pose" to="vrpn_client_node/Field/pose"/>
 	</node>
 
 	<!-- Start Controller node: providing inputs for controling the drone -->
-	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller">
+	<node pkg="tic_tac_drone" type="ControllerNode.py" name="Controller" output="screen">
 		<remap from="joystick_input" to="joy"/>
 		<param name="sensitivity" value="0.6"/>
 		<param name="yaw_rate" value="0.2"/>
