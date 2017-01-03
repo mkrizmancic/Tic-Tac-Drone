@@ -61,7 +61,7 @@ class OptitrackNode():
         euler = self.quat_to_eul(data)
         self.field.theta = degrees(euler[2])
 
-        #self.pub_f.publish(self.field)
+        pub_f.publish(self.field)
 
     # Must have __init__(self) function for a class
     def __init__(self):
