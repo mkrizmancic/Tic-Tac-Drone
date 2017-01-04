@@ -110,7 +110,7 @@ class GameDetectionNode():
         self.duration = rospy.Duration.from_sec(3)
 
         # Create subscribers
-        rospy.Subscriber("/Optitrack/field_pos", Point, self.set_origin) # NEPOTREBNO SE ZOVE PUNO PUTA
+        rospy.Subscriber("/Optitrack/field_pos", Pose2D, self.set_origin) # NEPOTREBNO SE ZOVE PUNO PUTA
         rospy.Subscriber("/TicTacToe/Make_move", MakeMove, self.next_move)
         rospy.Subscriber("/Optitrack/MyUAV/cpose",CustomPose, self.uav_tracking)
  
