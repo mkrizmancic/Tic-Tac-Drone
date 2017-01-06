@@ -47,7 +47,7 @@ class GameDetectionNode():
     def vector_rotation (old, base):
         """ Calculates exact coordinates for a target """
         new = Point()
-        fi = radians(base.theta)
+        fi = radians(base.theta if (base.theta >= 0) else base.theta + 360)
         new.x = old.x*cos(fi) - old.y*sin(fi) + base.x - base.x*cos(fi) + base.y*sin(fi)
         new.y = old.x*sin(fi) + old.y*cos(fi) + base.y - base.x*sin(fi) - base.y*cos(fi)
         new.z = 0
@@ -77,13 +77,15 @@ class GameDetectionNode():
         self.course_set = 1
      
     def uav_tracking (self, data):
-        self.pos = data.pos
+        self.pos.x = data.x
+        self.pos.y = data.y
+        self.pos.z = data.z
 
         if self.course_set:
             if self.publish_once:
                 pub_reg.publish (self.course[self.next_step]) # Publishes coordinates for next step to the regulator
                 self.publish_once = 0
-            self.check_leg(data.pos)
+            self.check_leg(self.pos)
 
     # Must have __init__(self) function for a class
     def __init__(self):

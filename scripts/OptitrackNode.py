@@ -34,23 +34,21 @@ class OptitrackNode():
         Callback function that adjust axis data for our UAV.
         Data is stored in class variables.
         """
-        self.uav1.pos.x = data.pose.position.x
-        self.uav1.pos.y = -data.pose.position.z
-        self.uav1.pos.z = data.pose.position.y
+        self.uav1.x = data.pose.position.x
+        self.uav1.y = -data.pose.position.z
+        self.uav1.z = data.pose.position.y
 
         euler = self.quat_to_eul(data)
-        self.uav1.rot.roll = degrees(euler[0])
-        self.uav1.rot.pitch = degrees(euler[1])
-        self.uav1.rot.yaw = degrees(euler[2])
+        self.uav1.yaw = degrees(euler[2])
 
     def adjust_axis_2 (self,data):
         """ 
         Callback function that adjust axis data for opponent UAV.
         Data is stored in class variables.
         """
-        self.uav2.pos.x = data.pose.position.x
-        self.uav2.pos.y = data.pose.position.z
-        self.uav2.pos.z = data.pose.position.y
+        self.uav2.x = data.pose.position.x
+        self.uav2.y = -data.pose.position.z
+        self.uav2.z = data.pose.position.y
 
     def adjust_field (self, data):
         """
