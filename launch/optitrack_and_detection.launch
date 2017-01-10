@@ -1,7 +1,7 @@
 <launch>
 	<!-- Start VRPN Client node: getting data from Optitrack -->
 	<!-- Include  the file that contains your custom vrpn launch-->
-	<include file="/home/marko/catkin_ws/src/vrpn_client_ros/launch/across.launch"/>
+	<include file="$(find tic_tac_drone)/launch/across.launch"/>
 
 	<!-- Start Optitrack node: calculating and distributing postion data -->
 	<node pkg="tic_tac_drone" type="OptitrackNode.py" name="Optitrack">

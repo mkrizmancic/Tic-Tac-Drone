@@ -15,7 +15,7 @@ void cb(tic_tac_drone::CtrlValue& msg){
   analogWrite(roll, 255 * msg.roll);
 }
 
-ros::Subscriber<tic_tac_drone::CtrlValue> sub("manual_output", &cb);
+ros::Subscriber<tic_tac_drone::CtrlValue> sub("control", &cb);
 
 
 void setup() {

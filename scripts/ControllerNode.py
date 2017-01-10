@@ -42,12 +42,17 @@ class ControllerNode():
             self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
             self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
-        pub.publish(self.control)
+
+    def regulator_callback(self, data):
+        self.control.pitch = data.x * cos(data.theta) + data.y * sin(data.theta)
+        self.control.roll = data.x * sin(data.theta) + data.y * cos(data.theta)
+        self.control.yaw = data.yaw
+        self.control.throttle = data.z * self.kill
             
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher for commands
-        pub = rospy.Publisher('manual_output', CtrlValue, queue_size=1)
+        pub = rospy.Publisher('control', CtrlValue, queue_size=1)
 
         # Local helper variables
         self.mode = 0 # Modifier for controls sensitivity 0 -> 100%, 1 -> definied by self.sensitivity
@@ -66,10 +71,12 @@ class ControllerNode():
         
         # Create a subscriber for color msg
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
+        rospy.Subscriber("regulator_input", CtrlValue, self.regulator_callback)
         
         # Main while loop.
         rate = rospy.Rate(100)
         while not rospy.is_shutdown():
+            pub.publish(self.control)
             rate.sleep()
 
 if __name__ == '__main__':

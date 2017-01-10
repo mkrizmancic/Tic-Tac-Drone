@@ -39,7 +39,8 @@ class OptitrackNode():
         self.uav1.z = data.pose.position.y
 
         euler = self.quat_to_eul(data)
-        self.uav1.yaw = degrees(euler[2])
+        theta = degrees(euler[2])
+        self.uav1.yaw = theta if (theta >= 0) else theta + 360
 
     def adjust_axis_2 (self,data):
         """ 
@@ -55,11 +56,9 @@ class OptitrackNode():
         Callback function that adjusts axis data for playing field and publishes its position.
         """
         self.field.x = data.pose.position.x
-        self.field.y = data.pose.position.z
+        self.field.y = -data.pose.position.z
         euler = self.quat_to_eul(data)
         self.field.theta = degrees(euler[2])
-
-        pub_f.publish(self.field)
 
     # Must have __init__(self) function for a class
     def __init__(self):
