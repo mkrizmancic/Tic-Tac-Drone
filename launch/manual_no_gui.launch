@@ -1,7 +1,7 @@
 <launch>
 	<!-- Start VRPN Client node: getting data from Optitrack -->
 	<!-- Include  the file that contains your custom vrpn launch-->
-	<include file="$(find tic_tac_drone)/launch/borongaj.launch"/>
+	<include file="$(find tic_tac_drone)/launch/across.launch"/>
 
 	<!-- Start Joy node: user control with joystick -->
 	<node pkg="joy" type="joy_node" name="JoyInput">
@@ -31,8 +31,8 @@
 	</node>
 
 	<!-- Start Game detection node: planning course and detecting played move -->
-	<node pkg="tic_tac_drone" type="GameDetectionNode.py" name="GameDetection" output="screen">
+	<!--node pkg="tic_tac_drone" type="GameDetectionNode.py" name="GameDetection" output="screen">
 		<param name="_cell_size" value="0.5"/>
 		<param name="_max_height" value="1"/>
-	</node>
+	</node-->
 </launch>

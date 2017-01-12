@@ -33,7 +33,7 @@ class GameDetectionNode():
                 self.timer = 1
             else:
                 if (rospy.get_rostime() - self.start_time >= self.duration):
-                    if (self.next_step == 2):
+                    if (self.next_step == 4):
                         rospy.loginfo (rospy.get_caller_id() + "Potez odigran")
                         #return potez odigran
                         self.next_step = 0
@@ -72,17 +72,25 @@ class GameDetectionNode():
 
         self.course[0].x = self.pos.x
         self.course[0].y = self.pos.y
-        self.course[0].z = self.max_height
+        self.course[0].z = 0
         #rospy.loginfo ("1: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.max_height)
         
-        self.course[1].x = self.goal.x
-        self.course[1].y = self.goal.y   
+        self.course[1].x = self.pos.x
+        self.course[1].y = self.pos.y
         self.course[1].z = self.max_height
-        #rospy.loginfo ("2: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.max_height)
 
         self.course[2].x = self.goal.x
-        self.course[2].y = self.goal.y
-        self.course[2].z = 0
+        self.course[2].y = self.pos.y
+        self.course[2].z = self.max_height
+
+        self.course[3].x = self.goal.x
+        self.course[3].y = self.goal.y   
+        self.course[3].z = self.max_height
+        #rospy.loginfo ("2: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.max_height)
+
+        self.course[4].x = self.goal.x
+        self.course[4].y = self.goal.y
+        self.course[4].z = 0
         #rospy.loginfo ("3: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, 0)
 
         # rospy.loginfo ("*g: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.goal.z)
@@ -128,7 +136,7 @@ class GameDetectionNode():
         self.origin = Pose2D()  # Upper left corner of the playing field
         self.goal = Point()     # Next move cell location
         self.pos = Point()      # Drone position
-        self.course = [ Point() for i in range(3)]   # Set of waypoints for drone navigation
+        self.course = [ Point() for i in range(5)]   # Set of waypoints for drone navigation
         
         self.start_time = 0
 

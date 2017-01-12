@@ -9,7 +9,7 @@ and communicates with Arduino type microcontroller.
 #Must import rospy and msgs
 import rospy
 from sensor_msgs.msg import Joy
-from tic_tac_drone.msg import CtrlValue
+from tic_tac_drone.msg import CtrlValue, CustomPose
 
 
 class ControllerNode():
@@ -17,6 +17,8 @@ class ControllerNode():
     def joystick_callback(self,data):
         if (data.buttons[1]):
             self.mode = not self.mode
+            rospy.loginfo (rospy.get_caller_id() + ": Mode = {0} %".format(100 - self.mode * (1 - self.sensitivity) * 100))
+
 
         if (data.buttons[0]):
             self.kill = 0
@@ -25,7 +27,6 @@ class ControllerNode():
 
         modifier = self.sensitivity if self.mode else 1
 
-        rospy.loginfo (rospy.get_caller_id() + ": Mode = {0} %".format(100 - self.mode * (1 - self.sensitivity) * 100))
         if (data.buttons[10]):
             self.control.pitch = 0
             self.control.roll = 1
@@ -42,11 +43,10 @@ class ControllerNode():
             self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
             self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
-
     def regulator_callback(self, data):
-        self.control.pitch = data.x * cos(data.theta) + data.y * sin(data.theta)
-        self.control.roll = data.x * sin(data.theta) + data.y * cos(data.theta)
-        self.control.yaw = data.yaw
+        #self.control.pitch = data.x
+        #self.control.roll = data.y
+        #self.control.yaw = data.yaw
         self.control.throttle = data.z * self.kill
             
     # Must have __init__(self) function for a class
@@ -71,7 +71,7 @@ class ControllerNode():
         
         # Create a subscriber for color msg
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
-        rospy.Subscriber("regulator_input", CtrlValue, self.regulator_callback)
+        rospy.Subscriber("signal", CustomPose, self.regulator_callback)
         
         # Main while loop.
         rate = rospy.Rate(100)
