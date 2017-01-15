@@ -39,5 +39,5 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   nh.spinOnce();
-  delayMicroseconds(10);
+  delayMicroseconds(1000);
 }
