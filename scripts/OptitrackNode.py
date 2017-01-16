@@ -40,8 +40,7 @@ class OptitrackNode():
 
         euler = self.quat_to_eul(data)
         theta = degrees(euler[2])
-        self.uav1.yaw = theta if (theta >= 0) else theta + 360
-
+        self.uav1.yaw = theta
     def adjust_axis_2 (self,data):
         """ 
         Callback function that adjust axis data for opponent UAV.
@@ -73,9 +72,9 @@ class OptitrackNode():
         self.field = Pose2D()       # Position of playing field
         
         # Create subscribers
-        rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1)
-        rospy.Subscriber("OpUAV/pose", PoseStamped, self.adjust_axis_2)
-        rospy.Subscriber("Field/pose", PoseStamped, self.adjust_field)
+        rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1, queue_size=1)
+        rospy.Subscriber("OpUAV/pose", PoseStamped, self.adjust_axis_2, queue_size=1)
+        rospy.Subscriber("Field/pose", PoseStamped, self.adjust_field, queue_size=1)
         
         # Main while loop.
         rate = rospy.Rate(100)

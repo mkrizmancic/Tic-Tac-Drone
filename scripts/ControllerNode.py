@@ -38,15 +38,16 @@ class ControllerNode():
             self.control.throttle = 0
             self.control.yaw = 0
         else:
-            self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
-            self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
-            self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
-            self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
+            pass
+            #self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
+            #self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
+            #self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
+            #self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
     def regulator_callback(self, data):
-        #self.control.pitch = data.x
-        #self.control.roll = data.y
-        #self.control.yaw = data.yaw
+        self.control.pitch = data.x
+        self.control.roll = data.y
+        self.control.yaw = data.yaw
         self.control.throttle = data.z * self.kill
             
     # Must have __init__(self) function for a class
@@ -70,8 +71,8 @@ class ControllerNode():
         self.control.throttle = 0
         
         # Create a subscriber for color msg
-        rospy.Subscriber("joystick_input", Joy, self.joystick_callback)
-        rospy.Subscriber("signal", CustomPose, self.regulator_callback)
+        rospy.Subscriber("joystick_input", Joy, self.joystick_callback, queue_size=1)
+        rospy.Subscriber("signal", CustomPose, self.regulator_callback, queue_size=1)
         
         # Main while loop.
         rate = rospy.Rate(100)
