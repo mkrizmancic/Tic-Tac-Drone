@@ -41,6 +41,7 @@ class OptitrackNode():
         euler = self.quat_to_eul(data)
         theta = degrees(euler[2])
         self.uav1.yaw = theta
+        
     def adjust_axis_2 (self,data):
         """ 
         Callback function that adjust axis data for opponent UAV.

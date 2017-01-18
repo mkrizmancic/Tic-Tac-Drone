@@ -31,12 +31,15 @@
 	</node>
 
 	<!-- Start GUI_Game node: GUI and game algorithm -->
-	<node pkg="tic_tac_drone" type="GUI_GameNode.py" name="GUI" output="screen">
+	<node pkg="tic_tac_drone" type="GUI_with_algorithm.py" name="GUI" output="screen">
 	</node>
 
 	<!-- Start Game detection node: planning course and detecting played move -->
 	<node pkg="tic_tac_drone" type="GameDetectionNode.py" name="GameDetection" output="screen">
 		<param name="_cell_size" value="0.5"/>
 		<param name="_max_height" value="1"/>
+	</node>
+
+	<node pkg="tic_tac_drone" type="PID.py" name="PID" output="screen">
 	</node>
 </launch>

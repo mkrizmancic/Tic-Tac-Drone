@@ -48,7 +48,7 @@ class GameDetectionNode():
 
     def vector_rotation (self, old, base):
         """ Calculates exact coordinates for a target """
-        fi = radians(base.theta if (base.theta >= 0) else base.theta + 360)
+        fi = radians(base.theta)
         self.goal.x = old.x*cos(fi) - old.y*sin(fi) + base.x - base.x*cos(fi) + base.y*sin(fi)
         self.goal.y = old.x*sin(fi) + old.y*cos(fi) + base.y - base.x*sin(fi) - base.y*cos(fi)
         self.goal.z = 0

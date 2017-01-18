@@ -8,7 +8,7 @@ from geometry_msgs.msg import Point
 from math import *
 import time
 
-class Poruke:
+class Messages:
     """ Treba napisati docstring """
     def __init__(self):
         # Create publishers
@@ -19,6 +19,7 @@ class Poruke:
         self.signal = CustomPose()
         self.feedback = CustomPose()
         self.reference_pod = CustomPose()
+        self.running = 0
 
         # Create subscribers
         rospy.Subscriber("MyUAV/cpose", CustomPose, self.feedback_callback, queue_size=1)
@@ -33,19 +34,24 @@ class Poruke:
 
     def reference_callback(self, data):
         """ Treba napisati docstring """
+        self.running = 1
         self.reference_pod.x = data.x
         self.reference_pod.y = data.y
         self.reference_pod.z = data.z
-        self.reference_pod.yaw = 0
 
 
     def feedback_callback(self, data):
-        # IZBACITI NAKON SPREMANJA ODZIVA
         self.feedback.x = data.x
         self.feedback.y = data.y
         self.feedback.z = data.z
         self.feedback.yaw = data.yaw
 
+        if (not self.running):
+            self.reference_pod.x = self.feedback.x
+            self.reference_pod.y = self.feedback.y
+            self.reference_pod.z = self.feedback.z
+
+        # IZBACITI NAKON SPREMANJA ODZIVA
         self.pub1.publish(self.feedback)
 
 
@@ -109,16 +115,17 @@ class PID:
 
         # Calculate regulation error
         self.error[0] = self.set_point - current_value
+        print self.error[0]
         # Calculate P, I and D components
         self.u_p = self.Kr * self.error[0]
-        self.u_i[0]= self.Kr_i*self.error[0] + self.u_i[1]
-        self.u_d[0]=self.Kr_d*(self.error[0]-self.error[1])
+        self.u_i[0] = self.Kr_i * self.error[0] + self.u_i[1]
+        self.u_d[0] = self.Kr_d * (self.error[0] - self.error[1])
 
         # Integral part saturation
-        if self.u_i[0]> self.Integrator_max :
-            self.u_i[0]= self.Integrator_max
-        elif self.u_i[0]< self.Integrator_min:
-            self.u_i[0]= self.Integrator_min
+        if self.u_i[0] > self.Integrator_max :
+            self.u_i[0] = self.Integrator_max
+        elif self.u_i[0] < self.Integrator_min:
+            self.u_i[0] = self.Integrator_min
 
         # Store current values for future uses as history
         self.u_i[2] =  self.u_i[1]
@@ -140,9 +147,11 @@ if __name__ == '__main__':
 
     rospy.init_node('PID')
     try:
-        Mjerenja = Poruke()
+        Mes = Messages()
     except rospy.ROSInterruptException:
         pass
+
+    radius = 0.1
 
     signal_x_main = 0.0
     signal_y_main = 0.0
@@ -163,16 +172,16 @@ if __name__ == '__main__':
     rate = rospy.Rate (20)
     while not rospy.is_shutdown():
         # Set reference
-        PID_x.setPoint(Mjerenja.getX_reference())
-        PID_y.setPoint(Mjerenja.getY_reference())
-        PID_z.setPoint(Mjerenja.getZ_reference())
-        PID_yaw.setPoint(Mjerenja.getYAW_reference())
+        PID_x.setPoint(Mes.getX_reference())
+        PID_y.setPoint(Mes.getY_reference())
+        PID_z.setPoint(Mes.getZ_reference())
+        PID_yaw.setPoint(Mes.getYAW_reference())
 
         # Set current values
-        current_x = Mjerenja.getX_feedback()
-        current_y = Mjerenja.getY_feedback()
-        current_z = Mjerenja.getZ_feedback()
-        current_yaw = Mjerenja.getYAW_feedback()
+        current_x = Mes.getX_feedback()
+        current_y = Mes.getY_feedback()
+        current_z = Mes.getZ_feedback()
+        current_yaw = Mes.getYAW_feedback()
 
         # Calculate regulator output
         signal_x_main = PID_x.update(current_x)
@@ -185,7 +194,7 @@ if __name__ == '__main__':
             signal_z_main = 50.0
         elif signal_z_main < -50.0:
             signal_z_main = -50.0        
-        signal_z_main =(0.25/50.0)*signal_z_main+0.70 
+        signal_z_main = (0.25/50.0) * signal_z_main + 0.7 * Mes.running # ????? .25 i .7
 
         if signal_x_main > 0.2:
             signal_x_main = 0.2
@@ -202,12 +211,14 @@ if __name__ == '__main__':
         signal_yaw_main = signal_yaw_main + 0.5
 
 
-        # if(Mjerenja.getZ_reference() == 0 and abs(Mjerenja.getZ_reference()-current_z) <0.3 and kraj ):
-        #     rospy.sleep(0.05)
-        #     Mjerenja.send_signals(signal_x=0,signal_y=0,signal_z=0,signal_yaw=0)
-        #     Mjerenja.setNextMove(False)
-        #     break;
-
         # Publish control values for UAV
-        Mjerenja.send_signals(signal_x=signal_x_main,signal_y=signal_y_main,signal_z=signal_z_main,signal_yaw=signal_yaw_main)
+        Mes.send_signals(signal_x=signal_x_main,signal_y=signal_y_main,signal_z=signal_z_main,signal_yaw=signal_yaw_main)
+
+        condition = ((abs(Mes.getX_reference() - current_x) < radius) and 
+                    (abs(Mes.getY_reference() - current_y) < radius) and 
+                    (abs(Mes.getZ_reference() - current_z) < radius))
+
+        if(Mes.getZ_reference() == 0 and condition):
+            Mes.running = 0
+
         rate.sleep()
