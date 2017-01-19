@@ -5,6 +5,7 @@ __author__ = 'Branko'
 import rospy
 from tic_tac_drone.msg import CustomPose
 from geometry_msgs.msg import Point
+from std_msgs.msg import Float32
 from math import *
 import time
 
@@ -26,9 +27,9 @@ class Messages:
         rospy.Subscriber("reference", Point, self.reference_callback, queue_size=1)
 
         # Initialize reference
-        self.reference_pod.z = 1
+        self.reference_pod.z = 0
         self.reference_pod.x = 0
-        self.reference_pod.y = -2.1
+        self.reference_pod.y = 0
         self.reference_pod.yaw = 0
 
 
@@ -115,7 +116,7 @@ class PID:
 
         # Calculate regulation error
         self.error[0] = self.set_point - current_value
-        print self.error[0]
+
         # Calculate P, I and D components
         self.u_p = self.Kr * self.error[0]
         self.u_i[0] = self.Kr_i * self.error[0] + self.u_i[1]
@@ -152,6 +153,7 @@ if __name__ == '__main__':
         pass
 
     radius = 0.1
+    pub_p = rospy.Publisher("setpoint", Float32, queue_size=1)
 
     signal_x_main = 0.0
     signal_y_main = 0.0
@@ -166,7 +168,7 @@ if __name__ == '__main__':
 
     PID_z = PID(Kr=40.0, Integrator_max=50.0, Integrator_min=-50.0, Kr_i = 0.8, Kr_d= 1000.0)
 
-    PID_yaw = PID(Kr= -1.0/600, Integrator_max=50.0, Integrator_min=-50.0, Kr_i = 0, Kr_d= 0)
+    PID_yaw = PID(Kr= -1.0/500, Integrator_max=50.0, Integrator_min=-50.0, Kr_i = 0, Kr_d= 0)
 
 
     rate = rospy.Rate (20)
@@ -175,6 +177,7 @@ if __name__ == '__main__':
         PID_x.setPoint(Mes.getX_reference())
         PID_y.setPoint(Mes.getY_reference())
         PID_z.setPoint(Mes.getZ_reference())
+        pub_p.publish(PID_z.set_point)
         PID_yaw.setPoint(Mes.getYAW_reference())
 
         # Set current values
@@ -220,5 +223,6 @@ if __name__ == '__main__':
 
         if(Mes.getZ_reference() == 0 and condition):
             Mes.running = 0
+            PID_z.u_i=[0.0, 0.0, 0.0]
 
         rate.sleep()

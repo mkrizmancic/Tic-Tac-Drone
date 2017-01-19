@@ -27,40 +27,36 @@ class ControllerNode():
 
         modifier = self.sensitivity if self.mode else 1
 
-        #if not self.auto_mode:
-        if (data.buttons[10]):
-            self.control.pitch = 0
-            self.control.roll = 1
-            self.control.throttle = 0
-            self.control.yaw = 1
-        elif (data.buttons[5]):
-            self.control.pitch = 0
-            self.control.roll = 0
-            self.control.throttle = 0
-            self.control.yaw = 0
-        else:
-            pass
-            #self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
-            #self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
-            #self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
-            #self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
+        if not self.auto_mode:
+            if (data.buttons[10]):
+                self.control.pitch = 0
+                self.control.roll = 1
+                self.control.throttle = 0
+                self.control.yaw = 1
+            elif (data.buttons[5]):
+                self.control.pitch = 0
+                self.control.roll = 0
+                self.control.throttle = 0
+                self.control.yaw = 0
+            else:
+                self.control.pitch = (data.axes[1] * modifier + 1) * 0.5
+                self.control.roll = (-1 * data.axes[0] * modifier + 1) * 0.5
+                self.control.throttle = (data.axes[2] + 1) * 0.5 * self.kill
+                self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
     def regulator_callback(self, data):
-        #if self.auto_mode
-        self.control.pitch = data.x
-        self.control.roll = data.y
-        self.control.yaw = data.yaw
-        self.control.throttle = data.z * self.kill
+        if self.auto_mode:
+            self.control.pitch = data.x
+            self.control.roll = data.y
+            self.control.yaw = data.yaw
+            self.control.throttle = data.z * self.kill
 
     def kill_switch(self, data):
         self.kill = 0
 
-    # def flight_mode(self, data):
-    #     if data:
-    #         self.auto_mode = True
-    #     else:
-    #         self.auto_mode = False
-            
+    def flight_mode(self, data):
+        self.auto_mode = data.data
+
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher for commands
@@ -72,7 +68,7 @@ class ControllerNode():
         self.sensitivity = rospy.get_param('~sensitivity', 0.6)
         self.yaw_rate = rospy.get_param('~yaw_rate', 0.2)
         self.kill = 1 # Flag for a panic button
-        self.auto_mode = False
+        self.auto_mode = True
 
         # Set the message to publish as command.
         self.control = CtrlValue()
@@ -87,7 +83,7 @@ class ControllerNode():
         rospy.Subscriber("joystick_input", Joy, self.joystick_callback, queue_size=1)
         rospy.Subscriber("signal", CustomPose, self.regulator_callback, queue_size=1)
         rospy.Subscriber("kill", Bool, self.kill_switch, queue_size=1)
-        #rospy.Subscriber("flight_mode", Bool, self.flight_mode, queue_size=1)
+        rospy.Subscriber("flight_mode", Bool, self.flight_mode, queue_size=1)
 
         
         # Main while loop.

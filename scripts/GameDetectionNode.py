@@ -33,9 +33,9 @@ class GameDetectionNode():
                 self.timer = 1
             else:
                 if (rospy.get_rostime() - self.start_time >= self.duration):
-                    if (self.next_step == 4):
+                    if (self.next_step == 3):
                         rospy.loginfo (rospy.get_caller_id() + "Potez odigran")
-                        #return potez odigran
+                        self.pub_game.publish(self.move)
                         self.next_step = 0
                         self.course_set = 0
                     else:
@@ -64,33 +64,36 @@ class GameDetectionNode():
     def next_move (self, data):
         """ Defines target coordinates for next move """
         relative = Pose2D()
+        self.move.row = data.row
+        self.move.col = data.col
+        self.move.player = data.player
         relative.x = self.origin.x + data.col * self.cell_size + self.cell_size / 2
         relative.y = self.origin.y -(data.row * self.cell_size + self.cell_size / 2)  
         self.vector_rotation(relative, self.origin)
         #rospy.loginfo ("g: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.goal.z)
 
-
-        self.course[0].x = self.pos.x
-        self.course[0].y = self.pos.y
-        self.course[0].z = 0
+        print self.goal
+        # self.course[0].x = self.pos.x
+        # self.course[0].y = self.pos.y
+        # self.course[0].z = 0
         #rospy.loginfo ("1: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.max_height)
         
-        self.course[1].x = self.pos.x
+        self.course[0].x = self.pos.x
+        self.course[0].y = self.pos.y
+        self.course[0].z = self.max_height
+
+        self.course[1].x = self.goal.x
         self.course[1].y = self.pos.y
         self.course[1].z = self.max_height
 
         self.course[2].x = self.goal.x
-        self.course[2].y = self.pos.y
+        self.course[2].y = self.goal.y   
         self.course[2].z = self.max_height
-
-        self.course[3].x = self.goal.x
-        self.course[3].y = self.goal.y   
-        self.course[3].z = self.max_height
         #rospy.loginfo ("2: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.max_height)
 
-        self.course[4].x = self.goal.x
-        self.course[4].y = self.goal.y
-        self.course[4].z = 0
+        self.course[3].x = self.goal.x
+        self.course[3].y = self.goal.y
+        self.course[3].z = 0
         #rospy.loginfo ("3: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, 0)
 
         # rospy.loginfo ("*g: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.goal.z)
@@ -123,7 +126,7 @@ class GameDetectionNode():
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher
-        # pub_game = rospy.Publisher('', tic_tac_toe.msg, queue_size=1)
+        self.pub_game = rospy.Publisher('Get_move', MakeMove, queue_size=1)
         self.pub_reg = rospy.Publisher('reference', Point, queue_size=1)
 
         # Define flags
@@ -137,13 +140,14 @@ class GameDetectionNode():
         self.goal = Point()     # Next move cell location
         self.pos = Point()      # Drone position
         self.course = [ Point() for i in range(5)]   # Set of waypoints for drone navigation
+        self.move = MakeMove()
         
         self.start_time = 0
 
         #rospy.loginfo ("*!: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.pos.z)
 
         # Define parameters
-        self.cell_size = rospy.get_param("~cell_size", 0.5)
+        self.cell_size = rospy.get_param("~cell_size", 0.3)
         self.max_height = rospy.get_param("~max_height", 1)
         self.duration = rospy.Duration.from_sec(3)
 

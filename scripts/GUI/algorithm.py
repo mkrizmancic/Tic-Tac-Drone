@@ -23,7 +23,7 @@ class Algorithm():
         """
         Funkcija koja ažurira win liste za pojedini potez. Poziva se nakon svakog pozeza
         """
-
+        
         self.win[player][row] += 1
         self.win[player][3 + col] += 1
         if row == col:
@@ -32,6 +32,17 @@ class Algorithm():
         for i in range(3):
             if row + i == 2 and col == i:
                 self.win[player][7] += 1
+
+        # ispis winova
+        print("1 2 3 4 5 6 7 8")
+        out = ''
+        for i in range(8):
+            out += '{0} '.format(self.win[0][i])
+        print(out)
+        out = ''
+        for i in range(8):
+            out += '{0} '.format(self.win[1][i])
+        print(out)
 
     def print_board(self):
         """
@@ -64,8 +75,8 @@ class Algorithm():
         rospy.loginfo(out)  # ispis u konzolu
 
         # ispis winova
-        # vprint("1 2 3 4 5 6 7 8")
-        # vout = ''
+        # print("1 2 3 4 5 6 7 8")
+        # out = ''
         # for i in range(8):
         #     out += '{0} '.format(self.win[0][i])
         # print(out)
@@ -121,12 +132,14 @@ class Algorithm():
             1 - znak je uspješno stavljen na željeno polje
             0 - željeno polje je zauzeto
         """
+        print "Calling UAV to row: {0}, col: {1}".format(row,col)
         if self.check_board_move(row, col, player) == 1:
             # Setting message parameters
             self.make_move_msg.player = player
             self.make_move_msg.row = row
             self.make_move_msg.col = col
             self.pub.publish(self.make_move_msg)
+            self.print_board()
             return 1
         else:
             return 0
@@ -151,7 +164,7 @@ class Algorithm():
         if return_value == 1:
             self.board[row][col] = player
             self.update_win(player, row, col)
-
+            self.print_board()
         return return_value
 
     def block(self, player, i):
@@ -168,8 +181,8 @@ class Algorithm():
             0 inače
         """
         # check if the sent win is a full row
-        check = range(3)
-        if check.count(i):
+        print "pozvan block za i = {0}".format(i)
+        if i in range(3):
             for j in range(3):
                 if self.call_UAV_move(i, j, player):
                     return 1
@@ -208,6 +221,17 @@ class Algorithm():
         elif moves == 2:
             if self.win[0][1] == 1 and self.win[0][4] == 1:  # protivnik odigrao centar
                 self.call_UAV_move(2, 2, player)  # igraj suprotni kut
+                # print "Prvi debug"
+                # # ispis winova
+                # print("1 2 3 4 5 6 7 8")
+                # out = ''
+                # for i in range(8):
+                #     out += '{0} '.format(self.win[0][i])
+                # print(out)
+                # out = ''
+                # for i in range(8):
+                #     out += '{0} '.format(self.win[1][i])
+                # print(out)
 
             else:  # protivnik odigrao kut ili rub
                 if self.win[0][6] == 1 or self.win[0][7] == 1:  # protivnik igrao kut
@@ -383,7 +407,7 @@ class Algorithm():
         self.pub = rospy.Publisher("Make_move", MakeMove, queue_size=1)
         self.make_move_msg = MakeMove()
         
-        self.sub = rospy.Subscriber("Get_move", MakeMove, self.read_move)
+        #self.sub = rospy.Subscriber("Get_move", MakeMove, self.read_move)
 
 
 if __name__ == '__main__':
