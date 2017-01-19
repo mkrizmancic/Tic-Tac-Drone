@@ -164,11 +164,11 @@ if __name__ == '__main__':
 
     PID_x = PID(Kr=0.7, Integrator_max=100.0, Integrator_min=-100.0, Kr_i=0, Kr_d=10)
 
-    PID_y = PID(Kr=0.7, Integrator_max=100.0, Integrator_min=-100.0, Kr_i = 0, Kr_d= 10)
+    PID_y = PID(Kr=0.7, Integrator_max=100.0, Integrator_min=-100.0, Kr_i=0, Kr_d=10)
 
-    PID_z = PID(Kr=40.0, Integrator_max=50.0, Integrator_min=-50.0, Kr_i = 0.8, Kr_d= 1000.0)
+    PID_z = PID(Kr=40.0, Integrator_max=50.0, Integrator_min=-50.0, Kr_i=0.5, Kr_d=1000.0)
 
-    PID_yaw = PID(Kr= -1.0/500, Integrator_max=50.0, Integrator_min=-50.0, Kr_i = 0, Kr_d= 0)
+    PID_yaw = PID(Kr=-1.0/300, Integrator_max=50.0, Integrator_min=-50.0, Kr_i=0, Kr_d=0)
 
 
     rate = rospy.Rate (20)

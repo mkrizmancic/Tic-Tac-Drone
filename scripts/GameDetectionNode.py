@@ -15,7 +15,7 @@ from math import *
 
 class GameDetectionNode():
 
-    def in_sphere (self, radius = 0.1):
+    def in_sphere (self, radius = 0.075):
         """ Check is if drone is within 'radius' distance from target """
         #rospy.loginfo ("s: x=%f,  y=%f,  z=%f", self.course[0].x, self.course[0].y, self.course[0].z)
 
@@ -149,7 +149,7 @@ class GameDetectionNode():
         # Define parameters
         self.cell_size = rospy.get_param("~cell_size", 0.3)
         self.max_height = rospy.get_param("~max_height", 1)
-        self.duration = rospy.Duration.from_sec(3)
+        self.duration = rospy.Duration.from_sec(2)
 
         # Create subscribers
         rospy.Subscriber("/field_pos", Pose2D, self.set_origin) # NEPOTREBNO SE ZOVE PUNO PUTA

@@ -172,7 +172,7 @@ class Program(Frame):
         self.opponent_move5.grid(row=self.CANVAS_SIZE+8, column=7, columnspan=5, rowspan=5)
         self.opponent_move6 = Button(self, width=13, height=5, command=self.opponent_input_6, state='disabled', text = 'b3')
         self.opponent_move6.grid(row=self.CANVAS_SIZE+8, column=13, columnspan=5, rowspan=5)
-        self.opponent_move7 = Button(self, width=13, height=5, command=self.opponent_input_7, state='disabled', text = 'c1', font = f3)
+        self.opponent_move7 = Button(self, width=13, height=5, command=self.opponent_input_7, state='disabled', text = 'c1')
         self.opponent_move7.grid(row=self.CANVAS_SIZE+14, column=1, columnspan=5, rowspan=5)
         self.opponent_move8 = Button(self, width=13, height=5, command=self.opponent_input_8, state='disabled', text = 'c2')
         self.opponent_move8.grid(row=self.CANVAS_SIZE+14, column=7, columnspan=5, rowspan=5)
