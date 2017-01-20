@@ -148,7 +148,7 @@ if __name__ == '__main__':
         pass
 
     # Define local variables and initialize them
-    radius = 0.075
+    radius = 0.1
 
     signal_x_main = 0.0
     signal_y_main = 0.0

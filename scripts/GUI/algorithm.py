@@ -33,16 +33,6 @@ class Algorithm():
             if row + i == 2 and col == i:
                 self.win[player][7] += 1
 
-        # ispis winova
-        print("1 2 3 4 5 6 7 8")
-        out = ''
-        for i in range(8):
-            out += '{0} '.format(self.win[0][i])
-        print(out)
-        out = ''
-        for i in range(8):
-            out += '{0} '.format(self.win[1][i])
-        print(out)
 
     def print_board(self):
         """

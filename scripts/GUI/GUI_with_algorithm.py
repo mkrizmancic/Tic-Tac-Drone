@@ -33,12 +33,8 @@ class Program(Frame):
         self.uav_pos_z_str = StringVar()
         self.current_player = -1
 
-        rospy.Subscriber("Get_move", MakeMove, self.read_move)
-        rospy.Subscriber("MyUAV/cpose", CustomPose, self.get_pose)
-        self.uav_pos = CustomPose()
-        self.uav_pos.x = 0
-        self.uav_pos.y = 0
-        self.uav_pos.z = 0
+        rospy.Subscriber("Get_move", MakeMove, self.read_move, queue_size=1)
+        rospy.Subscriber("MyUAV/cpose", CustomPose, self.get_pose, queue_size=1)
 
         self.pub_r = rospy.Publisher("reference", Point, queue_size=1)
         self.pub_panic = rospy.Publisher("kill", Bool, queue_size=1)
@@ -276,13 +272,9 @@ class Program(Frame):
             self.end_callback()
 
     def get_pose(self, data):
-        self.uav_pos.x = data.x
-        self.uav_pos.y = data.y
-        self.uav_pos.z = data.z
         self.uav_pos_x_str.set("{:1.3f}".format(data.x))
         self.uav_pos_y_str.set("{:1.3f}".format(data.y))
         self.uav_pos_z_str.set("{:1.3f}".format(data.z))
-        self.draw_board()
         p.update_idletasks()
 
     def restart_callback(self):
@@ -518,8 +510,8 @@ class Program(Frame):
     def read_move(self, data):
         self.moves += 1
         ttt.update_win(data.player, data.row, data.col)
-        print
-        data
+        #print
+        #data
         ttt.board[data.row][data.col] = data.player
         self.switch_players()
 

@@ -15,10 +15,8 @@ from math import *
 
 class GameDetectionNode():
 
-    def in_sphere (self, radius = 0.075):
-        """ Check is if drone is within 'radius' distance from target """
-        #rospy.loginfo ("s: x=%f,  y=%f,  z=%f", self.course[0].x, self.course[0].y, self.course[0].z)
-
+    def in_sphere (self, radius):
+        """ Check if drone is within 'radius' distance from target """
         if (abs (self.course[self.next_step].x - self.pos.x) <= radius and abs (self.course[self.next_step].y - self.pos.y) <= radius and abs (self.course[self.next_step].z - self.pos.z) <= radius):
             return True
         else:
@@ -34,7 +32,7 @@ class GameDetectionNode():
             else:
                 if (rospy.get_rostime() - self.start_time >= self.duration):
                     if (self.next_step == 3):
-                        rospy.loginfo (rospy.get_caller_id() + "Potez odigran")
+                        rospy.loginfo (rospy.get_caller_id() + "Move played")
                         self.pub_game.publish(self.move)
                         self.next_step = 0
                         self.course_set = 0
@@ -86,14 +84,6 @@ class GameDetectionNode():
         self.course[3].x = self.goal.x
         self.course[3].y = self.goal.y
         self.course[3].z = 0
-
-        # self.course[1].x = self.goal.x
-        # self.course[1].y = self.goal.y   
-        # self.course[1].z = self.max_height
-
-        # self.course[2].x = self.goal.x
-        # self.course[2].y = self.goal.y
-        # self.course[2].z = 0
 
         self.course_set = 1
      
