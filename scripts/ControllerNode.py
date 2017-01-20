@@ -16,6 +16,7 @@ from tic_tac_drone.msg import CtrlValue, CustomPose
 class ControllerNode():
     # Callback for msgs
     def joystick_callback(self,data):
+        """ Callback function that handles inputs from joystick and converts them to signals """
         if (data.buttons[1]):
             self.mode = not self.mode
             rospy.loginfo (rospy.get_caller_id() + ": Mode = {0} %".format(100 - self.mode * (1 - self.sensitivity) * 100))
@@ -45,6 +46,7 @@ class ControllerNode():
                 self.control.yaw = 0.5 + data.buttons[3]*self.yaw_rate*(-1) + data.buttons[4]*self.yaw_rate
 
     def regulator_callback(self, data):
+        """ Callback function for rerouteing signals from regulator to the microcontroller """
         if self.auto_mode:
             self.control.pitch = data.x
             self.control.roll = data.y
@@ -52,9 +54,11 @@ class ControllerNode():
             self.control.throttle = data.z * self.kill
 
     def kill_switch(self, data):
+        """ Callback function for setting kill switch flag """
         self.kill = 0
 
     def flight_mode(self, data):
+        """ Callback function for setting flight mode to automatic or manual """
         self.auto_mode = data.data
 
     # Must have __init__(self) function for a class
@@ -84,7 +88,6 @@ class ControllerNode():
         rospy.Subscriber("signal", CustomPose, self.regulator_callback, queue_size=1)
         rospy.Subscriber("kill", Bool, self.kill_switch, queue_size=1)
         rospy.Subscriber("flight_mode", Bool, self.flight_mode, queue_size=1)
-
         
         # Main while loop.
         rate = rospy.Rate(100)

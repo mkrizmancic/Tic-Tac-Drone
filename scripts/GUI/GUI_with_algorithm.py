@@ -42,12 +42,12 @@ class Program(Frame):
 
         self.pub_r = rospy.Publisher("reference", Point, queue_size=1)
         self.pub_panic = rospy.Publisher("kill", Bool, queue_size=1)
-        self.pub_MakeMove = rospy.Publisher("Make_move", MakeMove,queue_size=1)  # šalje koordinate ploče u poluautomatskom radu
+        self.pub_MakeMove = rospy.Publisher("Make_move", MakeMove,queue_size=1)  
         self.pub_flightMode = rospy.Publisher("flight_mode", Bool, queue_size=1)
         self.reference = Point()
         self.kill = Bool()
-        self.auto_mode = Bool()
         self.kill = 1
+        self.auto_mode = Bool()
 
         self.kreiraj_sucelje()
         self.canvas = Canvas(self, width=300, height=300)
@@ -126,13 +126,6 @@ class Program(Frame):
         self.play_x.grid(row=7, column=self.CANVAS_SIZE + 8)
         self.play_o.grid(row=8, column=self.CANVAS_SIZE + 8)
 
-        # Signals and parameters
-        #self.odzivi = Label(self, font=f2, text="Signals:")
-        #self.parametri = Label(self, font=f2, text="Parameters:")
-
-        #self.odzivi.grid(row=self.CANVAS_SIZE + 1, column=self.CANVAS_SIZE / 2)
-        #self.parametri.grid(row=self.CANVAS_SIZE + 1, column=self.CANVAS_SIZE + 1)
-
         # Current position
         self.current_position_label = Label(self, font=f2, text="Current position:")
         self.current_x = Label(self, font=f2, text="X:")
@@ -142,9 +135,8 @@ class Program(Frame):
         self.current_x.grid(row=2, column=self.CANVAS_SIZE + 4 + self.CANVAS_SIZE)
         self.current_y.grid(row=3, column=self.CANVAS_SIZE + 4 + self.CANVAS_SIZE)
         self.current_z.grid(row=4, column=self.CANVAS_SIZE + 4 + self.CANVAS_SIZE)
-        # Current position display:
-        self.uav_pos.x
 
+        # Current position display:
         self.current_position_label_x = Label(self, font=f2, textvariable=self.uav_pos_x_str)
         self.current_position_label_x.grid(row=2, column=self.CANVAS_SIZE + 5 + self.CANVAS_SIZE)
 
@@ -158,32 +150,23 @@ class Program(Frame):
         self.opponent_input = Label(self, font=f2, text="Opponent move input")
         self.opponent_input.grid(row=self.CANVAS_SIZE + 1, column=1, columnspan=18)
 
-        self.opponent_move1 = Button(self, width=13, height=5, command=self.opponent_input_1, state='disabled',
-                                     text='a1')
+        self.opponent_move1 = Button(self, width=13, height=5, command=self.opponent_input_1, state='disabled', text='a1')
         self.opponent_move1.grid(row=self.CANVAS_SIZE + 2, column=1, columnspan=5, rowspan=5)
-        self.opponent_move2 = Button(self, width=13, height=5, command=self.opponent_input_2, state='disabled',
-                                     text='a2')
+        self.opponent_move2 = Button(self, width=13, height=5, command=self.opponent_input_2, state='disabled', text='a2')
         self.opponent_move2.grid(row=self.CANVAS_SIZE + 2, column=7, columnspan=5, rowspan=5)
-        self.opponent_move3 = Button(self, width=13, height=5, command=self.opponent_input_3, state='disabled',
-                                     text='a3')
+        self.opponent_move3 = Button(self, width=13, height=5, command=self.opponent_input_3, state='disabled', text='a3')
         self.opponent_move3.grid(row=self.CANVAS_SIZE + 2, column=13, columnspan=5, rowspan=5)
-        self.opponent_move4 = Button(self, width=13, height=5, command=self.opponent_input_4, state='disabled',
-                                     text='b1')
+        self.opponent_move4 = Button(self, width=13, height=5, command=self.opponent_input_4, state='disabled', text='b1')
         self.opponent_move4.grid(row=self.CANVAS_SIZE + 8, column=1, columnspan=5, rowspan=5)
-        self.opponent_move5 = Button(self, width=13, height=5, command=self.opponent_input_5, state='disabled',
-                                     text='b2')
+        self.opponent_move5 = Button(self, width=13, height=5, command=self.opponent_input_5, state='disabled', text='b2')
         self.opponent_move5.grid(row=self.CANVAS_SIZE + 8, column=7, columnspan=5, rowspan=5)
-        self.opponent_move6 = Button(self, width=13, height=5, command=self.opponent_input_6, state='disabled',
-                                     text='b3')
+        self.opponent_move6 = Button(self, width=13, height=5, command=self.opponent_input_6, state='disabled', text='b3')
         self.opponent_move6.grid(row=self.CANVAS_SIZE + 8, column=13, columnspan=5, rowspan=5)
-        self.opponent_move7 = Button(self, width=13, height=5, command=self.opponent_input_7, state='disabled',
-                                     text='c1')
+        self.opponent_move7 = Button(self, width=13, height=5, command=self.opponent_input_7, state='disabled', text='c1')
         self.opponent_move7.grid(row=self.CANVAS_SIZE + 14, column=1, columnspan=5, rowspan=5)
-        self.opponent_move8 = Button(self, width=13, height=5, command=self.opponent_input_8, state='disabled',
-                                     text='c2')
+        self.opponent_move8 = Button(self, width=13, height=5, command=self.opponent_input_8, state='disabled', text='c2')
         self.opponent_move8.grid(row=self.CANVAS_SIZE + 14, column=7, columnspan=5, rowspan=5)
-        self.opponent_move9 = Button(self, width=13, height=5, command=self.opponent_input_9, state='disabled',
-                                     text='c3')
+        self.opponent_move9 = Button(self, width=13, height=5, command=self.opponent_input_9, state='disabled', text='c3')
         self.opponent_move9.grid(row=self.CANVAS_SIZE + 14, column=13, columnspan=5, rowspan=5)
         return
 
@@ -215,13 +198,10 @@ class Program(Frame):
                 centar_x = col * 100 + 50
                 centar_y = row * 100 + 50
                 if ttt.board[row][col] == 0:
-                    self.canvas.create_oval(centar_x - 25, centar_y - 25, centar_x + 25, centar_y + 25, width=3,
-                                            outline='red')
+                    self.canvas.create_oval(centar_x - 25, centar_y - 25, centar_x + 25, centar_y + 25, width=3, outline='red')
                 if ttt.board[row][col] == 1:
-                    self.canvas.create_line(centar_x - 25, centar_y - 25, centar_x + 25, centar_y + 25, width=3,
-                                            fill='gray')
-                    self.canvas.create_line(centar_x - 25, centar_y + 25, centar_x + 25, centar_y - 25, width=3,
-                                            fill='gray')
+                    self.canvas.create_line(centar_x - 25, centar_y - 25, centar_x + 25, centar_y + 25, width=3, fill='gray')
+                    self.canvas.create_line(centar_x - 25, centar_y + 25, centar_x + 25, centar_y - 25, width=3, fill='gray')
                 if ttt.win[0][0] == 3 or ttt.win[1][0] == 3:
                     self.canvas.create_line(25, 50, 275, 50)
                 if ttt.win[0][1] == 3 or ttt.win[1][1] == 3:
@@ -338,7 +318,6 @@ class Program(Frame):
         :return:
         None
         """
-
         self.pub_panic.publish(self.kill)
 
     def change_mode(self, mod):
@@ -552,7 +531,6 @@ class Program(Frame):
     def opponent_moves_visibility(self):
         if (self.current_player == 1 and self.play_x_o.get() == 'X'
             or self.current_player == 0 and self.play_x_o.get() == 'O'):
-            tkMessageBox.showinfo("Kraj!", "aktivni nisu")
             self.opponent_move1.config(state='disabled')
             self.opponent_move2.config(state='disabled')
             self.opponent_move3.config(state='disabled')
@@ -563,7 +541,6 @@ class Program(Frame):
             self.opponent_move8.config(state='disabled')
             self.opponent_move9.config(state='disabled')
         else:
-            tkMessageBox.showinfo("Kraj!", "aktivni su")
             self.opponent_move1.config(state='active')
             self.opponent_move2.config(state='active')
             self.opponent_move3.config(state='active')

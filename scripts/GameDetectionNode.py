@@ -70,14 +70,7 @@ class GameDetectionNode():
         relative.x = self.origin.x + data.col * self.cell_size + self.cell_size / 2
         relative.y = self.origin.y -(data.row * self.cell_size + self.cell_size / 2)  
         self.vector_rotation(relative, self.origin)
-        #rospy.loginfo ("g: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.goal.z)
-
-        print self.goal
-        # self.course[0].x = self.pos.x
-        # self.course[0].y = self.pos.y
-        # self.course[0].z = 0
-        #rospy.loginfo ("1: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.max_height)
-        
+       
         self.course[0].x = self.pos.x
         self.course[0].y = self.pos.y
         self.course[0].z = self.max_height
@@ -89,36 +82,31 @@ class GameDetectionNode():
         self.course[2].x = self.goal.x
         self.course[2].y = self.goal.y   
         self.course[2].z = self.max_height
-        #rospy.loginfo ("2: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.max_height)
 
         self.course[3].x = self.goal.x
         self.course[3].y = self.goal.y
         self.course[3].z = 0
-        #rospy.loginfo ("3: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, 0)
 
-        # rospy.loginfo ("*g: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.goal.z)
-        # rospy.loginfo ("*1: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.max_height)
-        # rospy.loginfo ("*2: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, self.max_height)
-        # rospy.loginfo ("*3: x=%f,  y=%f,  z=%f", self.goal.x, self.goal.y, 0)
+        # self.course[1].x = self.goal.x
+        # self.course[1].y = self.goal.y   
+        # self.course[1].z = self.max_height
 
-
-        # rospy.loginfo ("-0: x=%f,  y=%f,  z=%f", self.course[0].x, self.course[0].y, self.course[0].z)
-        # rospy.loginfo ("-1: x=%f,  y=%f,  z=%f", self.course[1].x, self.course[1].y, self.course[1].z)
-        # rospy.loginfo ("-2: x=%f,  y=%f,  z=%f", self.course[2].x, self.course[2].y, self.course[2].z)
+        # self.course[2].x = self.goal.x
+        # self.course[2].y = self.goal.y
+        # self.course[2].z = 0
 
         self.course_set = 1
      
     def uav_tracking (self, data):
+        """ 
+        Saves current position of an UAV and calls check_leg function for tracking it's path 
+        """
         self.pos.x = data.x
         self.pos.y = data.y
         self.pos.z = data.z
 
         if self.course_set:
             if self.publish_once:
-                #rospy.loginfo ("reg_0: x=%f,  y=%f,  z=%f", self.course[0].x, self.course[0].y, self.course[0].z)
-
-                #rospy.loginfo ("reg: x=%f,  y=%f,  z=%f", self.course[self.next_step].x, self.course[self.next_step].y, self.course[self.next_step].z)
-
                 self.pub_reg.publish (self.course[self.next_step]) # Publishes coordinates for next step to the regulator
                 self.publish_once = 0
             self.check_leg()
@@ -139,12 +127,9 @@ class GameDetectionNode():
         self.origin = Pose2D()  # Upper left corner of the playing field
         self.goal = Point()     # Next move cell location
         self.pos = Point()      # Drone position
-        self.course = [ Point() for i in range(5)]   # Set of waypoints for drone navigation
+        self.course = [ Point() for i in range(4)]   # Set of waypoints for drone navigation
         self.move = MakeMove()
-        
         self.start_time = 0
-
-        #rospy.loginfo ("*!: x=%f,  y=%f,  z=%f", self.pos.x, self.pos.y, self.pos.z)
 
         # Define parameters
         self.cell_size = rospy.get_param("~cell_size", 0.3)
@@ -152,7 +137,7 @@ class GameDetectionNode():
         self.duration = rospy.Duration.from_sec(2)
 
         # Create subscribers
-        rospy.Subscriber("/field_pos", Pose2D, self.set_origin) # NEPOTREBNO SE ZOVE PUNO PUTA
+        rospy.Subscriber("/field_pos", Pose2D, self.set_origin)
         rospy.Subscriber("/Make_move", MakeMove, self.next_move)
         rospy.Subscriber("/MyUAV/cpose",CustomPose, self.uav_tracking)
  
