@@ -52,7 +52,7 @@ class Messages:
 
 
     def send_signals(self, signal_x=0.5, signal_y=0.5, signal_z=0, signal_yaw=0.5):
-        """ Treba napisati docstring """
+        """ Function for sending signals to the microcontroller """
         self.signal.x = signal_x
         self.signal.y = signal_y
         self.signal.z = signal_z
