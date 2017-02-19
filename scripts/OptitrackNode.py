@@ -29,7 +29,7 @@ class OptitrackNode():
 
         return euler_from_quaternion(quaternion)
 
-    def adjust_axis_1 (self,data):
+    def adjust_axis (self,data):
         """ 
         Callback function that adjust axis data for our UAV.
         Data is stored in class variables.
@@ -52,26 +52,26 @@ class OptitrackNode():
         euler = self.quat_to_eul(data)
         self.field.theta = degrees(euler[2])
 
+
     # Must have __init__(self) function for a class
     def __init__(self):
         # Create a publisher
-        pub_p1 = rospy.Publisher('MyUAV/cpose', CustomPose, queue_size=1)
+        pub_p = rospy.Publisher('MyUAV/cpose', CustomPose, queue_size=1)
         pub_f = rospy.Publisher('field_pos', Pose2D, queue_size=1)
  
         # Set the message to publish as command.
         self.uav1 = CustomPose()    # Position of our UAV
-        self.uav2 = CustomPose()    # Position of opponent UAV
         self.field = Pose2D()       # Position of playing field
         
         # Create subscribers
-        rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis_1, queue_size=1)
+        rospy.Subscriber("MyUAV/pose", PoseStamped, self.adjust_axis, queue_size=1)
         rospy.Subscriber("Field/pose", PoseStamped, self.adjust_field, queue_size=1)
         
         # Main while loop.
         rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             # Publish our command.
-            pub_p1.publish(self.uav1)
+            pub_p.publish(self.uav1)
             pub_f.publish(self.field)
             rate.sleep()
 
