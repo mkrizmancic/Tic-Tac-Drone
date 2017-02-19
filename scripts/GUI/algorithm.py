@@ -5,6 +5,7 @@ import rospy
 from tic_tac_drone.msg import MakeMove
 from geometry_msgs.msg import Point
 
+
 class Algorithm():
     board = [[-1 for j in range(3)] for i in range(3)]  # stvaranje ploče - ploča[red][stupac]
     NUMWIN = 8
@@ -23,7 +24,7 @@ class Algorithm():
         """
         Funkcija koja ažurira win liste za pojedini potez. Poziva se nakon svakog pozeza
         """
-        
+
         self.win[player][row] += 1
         self.win[player][3 + col] += 1
         if row == col:
@@ -32,7 +33,6 @@ class Algorithm():
         for i in range(3):
             if row + i == 2 and col == i:
                 self.win[player][7] += 1
-
 
     def print_board(self):
         """
@@ -62,18 +62,7 @@ class Algorithm():
 
         # ploča je u stringu, dodavanje slova stupaca
         out += '  a  b  c\n'
-        rospy.loginfo(out)  # ispis u konzolu
-
-        # ispis winova
-        # print("1 2 3 4 5 6 7 8")
-        # out = ''
-        # for i in range(8):
-        #     out += '{0} '.format(self.win[0][i])
-        # print(out)
-        # out = ''
-        # for i in range(8):
-        #     out += '{0} '.format(self.win[1][i])
-        # print(out)
+        rospy.loginfo(out)
 
     def check_board(self):
         """
@@ -117,19 +106,16 @@ class Algorithm():
         """
         Provjerava je li moguće napraviti željeni potez ovisno o trenutnom stanju ploče, te šalje koordinate
         čvoru za prihvat točaka u topicu MakeMove.
-
         Vraća:
             1 - znak je uspješno stavljen na željeno polje
             0 - željeno polje je zauzeto
         """
-        print "Calling UAV to row: {0}, col: {1}".format(row,col)
         if self.check_board_move(row, col, player) == 1:
             # Setting message parameters
             self.make_move_msg.player = player
             self.make_move_msg.row = row
             self.make_move_msg.col = col
             self.pub.publish(self.make_move_msg)
-            self.print_board()
             return 1
         else:
             return 0
@@ -138,11 +124,8 @@ class Algorithm():
         """
         Samo stavlja na ploču znak player, u red row i stupac col.
         Poziva funkciju za ažuriranje win lista.
-
         Ne objavljuje koordinate.
-
         Poziva funkciju za ažuriranje win lista.
-
         Vraća:
             1 - znak je uspješno stavljen na željeno polje
             0 - željeno polje je zauzeto
@@ -154,24 +137,20 @@ class Algorithm():
         if return_value == 1:
             self.board[row][col] = player
             self.update_win(player, row, col)
-            self.print_board()
         return return_value
 
     def block(self, player, i):
         """
         Funkcija koju AI poziva kad primijeti da nekome nedostaje jedan
         znak za pobjedu.
-
         Argumenti:
             player - znak koji je potrebno staviti
             i - indeks elementa u win listi
-
         Vraća:
             1 ako je akcija uspješna
             0 inače
         """
         # check if the sent win is a full row
-        print "pozvan block za i = {0}".format(i)
         if i in range(3):
             for j in range(3):
                 if self.call_UAV_move(i, j, player):
@@ -198,7 +177,6 @@ class Algorithm():
     def AIX(self, moves):
         """
         AI za križić
-
         Argumenti:
             moves: broj trenutnog poteza u igri
         """
@@ -211,17 +189,6 @@ class Algorithm():
         elif moves == 2:
             if self.win[0][1] == 1 and self.win[0][4] == 1:  # protivnik odigrao centar
                 self.call_UAV_move(2, 2, player)  # igraj suprotni kut
-                # print "Prvi debug"
-                # # ispis winova
-                # print("1 2 3 4 5 6 7 8")
-                # out = ''
-                # for i in range(8):
-                #     out += '{0} '.format(self.win[0][i])
-                # print(out)
-                # out = ''
-                # for i in range(8):
-                #     out += '{0} '.format(self.win[1][i])
-                # print(out)
 
             else:  # protivnik odigrao kut ili rub
                 if self.win[0][6] == 1 or self.win[0][7] == 1:  # protivnik igrao kut
@@ -274,7 +241,6 @@ class Algorithm():
     def AIO(self, moves):
         """
         Vuče kružićev potez.
-
         Argumenti:
             moves - broj trenutnog poteza
         """
@@ -303,7 +269,7 @@ class Algorithm():
                         self.block(player, i)
                         return 1
 
-                # nema se što blokirati, nešto se sprema!                    
+                # nema se što blokirati, nešto se sprema!
                 # provijeri koji su kutevi opasni
                 # kutevi: 0,3; 0,5; 2,3; 2,5;
                 if self.win[1][0] + self.win[1][3] == 2:
@@ -360,45 +326,18 @@ class Algorithm():
                     if self.block(0, i):
                         return 1
 
-    def read_move(self, data):
-        """
-        Callback for the Get_move message, places opponent's sign on the board
-
-        When the system registers that a UAV has landed, it publishes a MakeMove message containing the board
-        coordinates of the tile. When this kind of message is received, the corresponding player's symbol is placed
-        on the board
-
-        :return:
-            1: everything OK
-            0: ERROR! Field already occupied!
-           -1: exception, field not part of the board
-           -2: exception, player not defined
-        """
-
-        return self.make_board_move(player=data.player, row=data.row, col=data.col)
-
     def __init__(self):
         """
         Sets up the ros publishers and subscribers.
-
         Published message:
-
             Make_move: sends the board coordinates of the next call_UAV_move to be made by defining the row and collumn
-
         Subscribed to the message:
-
             Get_move: gets information about the opponents call_UAV_move in order to update the board.
-
-
-
         :return:
             Void
         """
         self.pub = rospy.Publisher("Make_move", MakeMove, queue_size=1)
         self.make_move_msg = MakeMove()
-        
-        #self.sub = rospy.Subscriber("Get_move", MakeMove, self.read_move)
-
 
 if __name__ == '__main__':
 
@@ -448,4 +387,4 @@ if __name__ == '__main__':
             rospy.loginfo("Čestitke kružiću! Pobijedio je u ovoj rundi!")
 
         else:
-            rospy.loginfo("Izjednačeno je!")
+rospy.loginfo("Izjednačeno je!")

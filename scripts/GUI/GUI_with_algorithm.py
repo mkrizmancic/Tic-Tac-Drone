@@ -38,7 +38,7 @@ class Program(Frame):
 
         self.pub_r = rospy.Publisher("reference", Point, queue_size=1)
         self.pub_panic = rospy.Publisher("kill", Bool, queue_size=1)
-        self.pub_MakeMove = rospy.Publisher("Make_move", MakeMove,queue_size=1)  
+        self.pub_MakeMove = rospy.Publisher("Make_move", MakeMove,queue_size=1)
         self.pub_flightMode = rospy.Publisher("flight_mode", Bool, queue_size=1)
         self.reference = Point()
         self.kill = Bool()
@@ -510,8 +510,6 @@ class Program(Frame):
     def read_move(self, data):
         self.moves += 1
         ttt.update_win(data.player, data.row, data.col)
-        #print
-        #data
         ttt.board[data.row][data.col] = data.player
         self.switch_players()
 
@@ -560,5 +558,5 @@ if __name__ == '__main__':
     p.master.title('Tic-Tac-Drone-GUI')
 
     # zavrti petlju za rukovanje događajima
-    # nije potreban rospy.spin()?
-    mainloop()
+    # nije potreban rospy.spin()
+mainloop()
