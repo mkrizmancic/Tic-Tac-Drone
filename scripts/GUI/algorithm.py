@@ -387,4 +387,4 @@ if __name__ == '__main__':
             rospy.loginfo("Čestitke kružiću! Pobijedio je u ovoj rundi!")
 
         else:
-rospy.loginfo("Izjednačeno je!")
+            rospy.loginfo("Izjednačeno je!")
